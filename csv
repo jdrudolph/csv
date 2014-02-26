@@ -1,0 +1,46 @@
+#!/usr/bin/env python
+import csv
+import sys
+import argparse
+
+if __name__ == '__main__':
+	parser = argparse.ArgumentParser(description='filter one column of a csv file')	
+	subparsers = parser.add_subparsers(dest='cmd')
+
+	get = subparsers.add_parser('get')
+	group = get.add_mutually_exclusive_group(required=True)
+	group.add_argument('-i', '--index', type=int)
+	group.add_argument('-n', '--name')
+	get.add_argument('-t', '--type',
+			help='specify the type format of the output',
+			default='string')
+	get.add_argument('inp', metavar='in', nargs='?', type=argparse.FileType('r'),
+			default=sys.stdin, help='input file (default: stdin)')
+	get.add_argument('out', nargs='?', type=argparse.FileType('w'),
+			default=sys.stdout, help='output file (default: stdout)')
+
+	show = subparsers.add_parser('show')
+	show.add_argument('inp', metavar='in', nargs='?', type=argparse.FileType('r'),
+			default=sys.stdin, help='input file (default: stdin)')
+	show.add_argument('out', nargs='?', type=argparse.FileType('w'),
+			default=sys.stdout, help='output file (default: stdout)')
+	
+	args = parser.parse_args()
+	
+	if args.cmd == 'get':
+		out_type = lambda x : str(x)
+		if args.type == 'int':
+			out_type = lambda x: str(int(float(x)))
+
+		for line in list(csv.reader(args.inp))[1:]:
+			x = line[args.column]
+			if len(x) > 0:
+				try:
+					args.out.write(out_type(x) + '\n')
+				except IOError as e:
+					print 'ERROR:', x, e
+
+	elif args.cmd == 'show':
+		for line in csv.reader(args.inp):
+			args.out.write(' '.join([str(i) + ':' + c for i,c in enumerate(line)]) + '\n')
+			sys.exit(0)

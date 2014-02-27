@@ -26,21 +26,34 @@ if __name__ == '__main__':
 			default=sys.stdout, help='output file (default: stdout)')
 	
 	args = parser.parse_args()
+	reader = csv.reader(args.inp)
+	header = reader.next()
 	
 	if args.cmd == 'get':
 		out_type = lambda x : str(x)
 		if args.type == 'int':
 			out_type = lambda x: str(int(float(x)))
+		
+		if args.index is not None:
+			column = args.index
+		elif args.name is not None:
+			try:
+				column = header.index(args.name)
+			except ValueError as e:
+				print 'Invalid column', args.name
+				sys.exit(1)
 
-		for line in list(csv.reader(args.inp))[1:]:
-			x = line[args.column]
+		for line in reader:
+			x = line[column]
 			if len(x) > 0:
 				try:
 					args.out.write(out_type(x) + '\n')
 				except IOError as e:
 					print 'ERROR:', x, e
-
+					sys.exit(1)
+		sys.exit(0)
+	
 	elif args.cmd == 'show':
-		for line in csv.reader(args.inp):
-			args.out.write(' '.join([str(i) + ':' + c for i,c in enumerate(line)]) + '\n')
-			sys.exit(0)
+		args.out.write(' '.join([str(i) + ':' + c for i,c in enumerate(header)]) + '\n')
+			
+		sys.exit(0)

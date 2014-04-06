@@ -27,8 +27,8 @@ def _get(args):
             try:
                 if len(x) == 0:
                     args.out.write('\n')
-                    continue
-                args.out.write(','.join(x) + '\n')
+                else:
+                    args.out.write(','.join(x) + '\n')
             except IOError as e:
                 print 'ERROR:', x, e
                 sys.exit(1)
@@ -41,10 +41,11 @@ if __name__ == '__main__':
     group = get.add_argument_group('column selection')
     group.add_argument('-i', '--index', nargs='*', action='append', type=int)
     group.add_argument('-n', '--name', nargs='*', action='append')
-    get.add_argument('-l', '--headless', help='do not print header', default=False)
-	get.add_argument('-s', '--strip',
-			help='ignore empty cells',
-			action='store_true')
+    get.add_argument('-l', '--headless', help='do not print header',
+            action='store_true')
+    get.add_argument('-s', '--strip',
+            help='ignore empty cells',
+            action='store_true')
     get.add_argument('inp', metavar='in', nargs='?', type=argparse.FileType('r'),
             default=sys.stdin, help='input file (default: stdin)')
     get.add_argument('out', nargs='?', type=argparse.FileType('w'),
@@ -73,5 +74,3 @@ if __name__ == '__main__':
             sep = '\n'
         args.out.write(sep.join([str(i) + ':' + c for i,c in enumerate(header)]) + '\n')
         sys.exit(0)
-
->>>>>>> Stashed changes

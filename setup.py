@@ -1,6 +1,6 @@
 from distutils.core import setup
 setup(name='csv',
-		version='0.2',
+		version='0.3',
 		scripts=['csv'],
 
 		author='Jan Rudolph',

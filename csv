@@ -7,7 +7,7 @@ def _get(args):
     columns = []
     if args.index is not None:
         columns += [x[0] for x in args.index]
-    elif args.name is not None:
+    if args.name is not None:
         for names in args.name:
             name = names[0]
             try:
@@ -39,23 +39,23 @@ if __name__ == '__main__':
 
     get = subparsers.add_parser('get')
     group = get.add_argument_group('column selection')
-    group.add_argument('-i', '--index', nargs='*', action='append', type=int)
+    group.add_argument('-x', '--index', nargs='*', action='append', type=int)
     group.add_argument('-n', '--name', nargs='*', action='append')
     get.add_argument('-l', '--headless', help='do not print header',
             action='store_true')
     get.add_argument('-s', '--strip',
             help='ignore empty cells',
             action='store_true')
-    get.add_argument('inp', metavar='in', nargs='?', type=argparse.FileType('r'),
+    get.add_argument('-i', '--input', dest='inp', metavar='IN', nargs='?', type=argparse.FileType('r'),
             default=sys.stdin, help='input file (default: stdin)')
-    get.add_argument('out', nargs='?', type=argparse.FileType('w'),
+    get.add_argument('-o', '--output', dest='out', nargs='?', type=argparse.FileType('w'),
             default=sys.stdout, help='output file (default: stdout)')
 
     show = subparsers.add_parser('show')
-    show.add_argument('-d', '--dense', default=False)
-    show.add_argument('inp', metavar='in', nargs='?', type=argparse.FileType('r'),
+    show.add_argument('-d', '--dense', action='store_true')
+    show.add_argument('-i', '--input', dest='inp', metavar='IN', nargs='?', type=argparse.FileType('r'),
             default=sys.stdin, help='input file (default: stdin)')
-    show.add_argument('out', nargs='?', type=argparse.FileType('w'),
+    show.add_argument('-o', '--output', dest='out', nargs='?', type=argparse.FileType('w'),
             default=sys.stdout, help='output file (default: stdout)')
 
     args = parser.parse_args()

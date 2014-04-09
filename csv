@@ -3,18 +3,18 @@ import csv
 import sys
 import argparse
 
-def _get(args):
+def _get(args, header, reader):
     columns = []
     if args.index is not None:
-        columns += [x[0] for x in args.index]
+        columns += [y for x in args.index for y in x]
     if args.name is not None:
         for names in args.name:
-            name = names[0]
-            try:
-                columns += [header.index(name)]
-            except ValueError as e:
-                print 'Invalid column', name
-                sys.exit(1)
+            for name in names:
+                try:
+                    columns += [header.index(name)]
+                except ValueError as e:
+                    print 'Invalid column', name
+                    sys.exit(1)
 
     if not args.headless:
         args.out.write(','.join([header[c] for c in columns]) + '\n')
@@ -34,37 +34,35 @@ def _get(args):
                 sys.exit(1)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='filter one column of a csv file')	
+    parser = argparse.ArgumentParser(description='extract columns from a csv file')	
     subparsers = parser.add_subparsers(dest='cmd')
 
     get = subparsers.add_parser('get')
-    group = get.add_argument_group('column selection')
-    group.add_argument('-x', '--index', nargs='*', action='append', type=int)
-    group.add_argument('-n', '--name', nargs='*', action='append')
+    get.add_argument('inp', metavar='IN', nargs='?', type=argparse.FileType('r'),
+            default=sys.stdin, help='input file (default: stdin)')
+    get.add_argument('-i', '--index', nargs='+', action='append', type=int)
+    get.add_argument('-n', '--name', nargs='+', action='append',
+            help='column headers as defined by the first row of the file')
     get.add_argument('-l', '--headless', help='do not print header',
             action='store_true')
-    get.add_argument('-s', '--strip',
-            help='ignore empty cells',
-            action='store_true')
-    get.add_argument('-i', '--input', dest='inp', metavar='IN', nargs='?', type=argparse.FileType('r'),
-            default=sys.stdin, help='input file (default: stdin)')
-    get.add_argument('-o', '--output', dest='out', nargs='?', type=argparse.FileType('w'),
+    get.add_argument('-o', '--output', dest='out', nargs='?',
+            type=argparse.FileType('w'),
             default=sys.stdout, help='output file (default: stdout)')
 
     show = subparsers.add_parser('show')
-    show.add_argument('-d', '--dense', action='store_true')
-    show.add_argument('-i', '--input', dest='inp', metavar='IN', nargs='?', type=argparse.FileType('r'),
+    show.add_argument('inp', metavar='IN', nargs='?', type=argparse.FileType('r'),
             default=sys.stdin, help='input file (default: stdin)')
-    show.add_argument('-o', '--output', dest='out', nargs='?', type=argparse.FileType('w'),
+    show.add_argument('-d', '--dense', action='store_true')
+    show.add_argument('-o', '--output', dest='out', nargs='?',
+            type=argparse.FileType('w'),
             default=sys.stdout, help='output file (default: stdout)')
 
     args = parser.parse_args()
-    
     reader = csv.reader(args.inp)
     header = reader.next()
 
     if args.cmd == 'get':
-        _get(args)
+        _get(args, header, reader)
         sys.exit(0)
 
     elif args.cmd == 'show':

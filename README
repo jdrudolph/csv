@@ -1,1 +1,9 @@
 Make csv files accessible from the command line
+
+example usage:
+csv show infile.csv
+
+csv get infile.csv -i 0 1 -o outfile.csv
+
+pitfalls:
+the inputfile needs to be specified before `-n` or `-i`

@@ -21,17 +21,10 @@ def _get(args, header, reader):
 
     for line in reader:
         x = [line[c] for c in columns]
-        if args.strip and len(x) < 0:
-            continue
-        if len(x) > 0:
-            try:
-                if len(x) == 0:
-                    args.out.write('\n')
-                else:
-                    args.out.write(','.join(x) + '\n')
-            except IOError as e:
-                print 'ERROR:', x, e
-                sys.exit(1)
+        if len(x) == 0:
+            args.out.write('\n')
+        else:
+            args.out.write(','.join(x) + '\n')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='extract columns from a csv file')	
